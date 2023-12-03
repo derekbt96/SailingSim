@@ -1,33 +1,58 @@
 
-from boat import boat
-from environment import race
+from boat import Boat
+from environment import Race
 import loggingFunc
 import numpy as np
 import pygame
 
-raceVar = race(np.pi)
-boatA = boat([0,0])
-boatB = boat([10,0])
+raceVar = Race(np.pi)
+boatA = Boat([400,400],sim=False)
+# boatA.vel[0] = 100
 
-logger = loggingFunc.logSim()
+# logger = loggingFunc.logSim()
 
-dt = 0.1
-t = 0
+updateRate = 60
+dt = 1.0/updateRate
 
-a = 1.0
-b = np.array([1,2,3])
+WIDTH, HEIGHT =  1800, 1200
+WHITE = (255, 255, 255)
+YELLOW = (255, 255, 0)
+BLUE = (100, 149, 237)
+RED = (188, 39, 50)
+DARK_GREY = (80, 78, 81)
 
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Sailing Sim")
 
-for i in range(100):
+boats = [boatA]
 
-    raceVar.updateModel(dt)
+run = True
+clock = pygame.time.Clock()
+ctr = 0
 
-    boatA.update(raceVar,dt)
-    boatB.update(raceVar,dt)
+while run:
+    clock.tick(updateRate)
+    WIN.fill(BLUE)
 
-    logTemp = [t, boatA.pos, boatA.vel, boatB.pos, boatB.vel]
-    logger.log(logTemp)
+    # ctr += 1
+    # if ctr >= 1:
+    #     run = False
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+
+    for boat in boats:
+        boat.update(raceVar, dt)
+        boat.draw(WIN)
+
+    raceVar.draw(WIN)
+
+    boatA.updateInput(pygame.key.get_pressed())
     
-    t += dt
+    pygame.display.update()
 
-print(logger.vars[0].var)
+    # logTemp = [t, boatA.pos, boatA.vel, boatB.pos, boatB.vel]
+    # logger.log(logTemp)
+
+# print(logger.vars[0].var)
